@@ -3,7 +3,7 @@
 // http://gynvael.vexillium.org
 // http://vexillium.org
 //
-// additional thx to: 
+// additional thx to:
 //   Mateusz "j00ru" Jurczyk
 //   and others
 //
@@ -73,6 +73,12 @@ public:
   int Read(void *Buffer, int Size);
   int GetDescriptor() const;
 
+  // Return the low-level socket descriptor and detach it from this NetSock
+  // object (this will stop NetSock's destructor from shutting down and
+  // closing the socket on delete, but will also make the NetSock object
+  // generally not usable for most operations).
+  int DetachDescriptor();
+
   // Reads exactly Size bytes. Does not return until then,
   // unless an error has occured.
   // If it's used on a non-blocking socket, it switches the
@@ -86,7 +92,7 @@ public:
   // all the data is transmited.
   int Write(const void *Buffer, int Size);
   int WriteAll(const void *Buffer, int Size);
-  
+
   // Use BroadcastUDP to send packets to broadcast addresses.
   // Due to some change in Windows 7 BroadcastUDP cannot use 255.255.255.255 as source address,
   // currently you need to use an interface specific broadcast address (e.g. 192.168.1.255).

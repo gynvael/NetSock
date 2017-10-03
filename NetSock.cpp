@@ -3,7 +3,7 @@
 // http://gynvael.vexillium.org
 // http://vexillium.org
 //
-// additional thx to: 
+// additional thx to:
 //   Mateusz "j00ru" Jurczyk
 //   and others
 //
@@ -64,7 +64,7 @@ NetSock::NetSock()
   this->bindport = 0;
 
   this->str_ip[0] = '\0';
-  this->str_bindip[0] = '\0';  
+  this->str_bindip[0] = '\0';
 }
 
 NetSock::~NetSock()
@@ -73,7 +73,7 @@ NetSock::~NetSock()
 }
 
 bool
-NetSock::InitNetworking(void) 
+NetSock::InitNetworking(void)
 {
 #ifdef _WIN32
   WSADATA wsdat;
@@ -204,7 +204,7 @@ NetSock::Connect(const char* host, unsigned short port)
   return this->Connect(htonl(ip), port);
 }
 
-bool 
+bool
 NetSock::Connect(unsigned int ip, unsigned short port)
 {
   struct sockaddr_in sock_info;
@@ -240,8 +240,8 @@ NetSock::Connect(unsigned int ip, unsigned short port)
   this->socket = sock;
   return true;
 }
-  
-bool 
+
+bool
 NetSock::SetMode(int mode)
 {
 #if defined(WIN32)
@@ -249,7 +249,7 @@ NetSock::SetMode(int mode)
 #endif
   if(this->socket == -1)
     return false;
-  
+
   if(this->mode == mode)
     return true;
 
@@ -278,12 +278,13 @@ NetSock::SetMode(int mode)
   return true;
 }
 
-bool 
+bool
 NetSock::Disconnect()
 {
   if(this->socket == -1)
     return false;
 
+  shutdown(this->socket, SHUT_RDWR);
   closesocket(this->socket);
   this->socket = -1;
   this->ip     = 0x00000000;
@@ -292,7 +293,7 @@ NetSock::Disconnect()
   return true;
 }
 
-int 
+int
 NetSock::Read(void *Buffer, int Size)
 {
   if(this->socket == -1)
@@ -309,17 +310,17 @@ NetSock::ReadAll(void *Buffer, int Size)
   if(this->socket == -1)
     return -1;
 
-  // If non-blocking, switch to blocking mode to 
+  // If non-blocking, switch to blocking mode to
   // save CPU cycles. This function is always blocking.
   int old_mode = this->mode;
-  if(this->mode == ASYNCHRONIC) 
+  if(this->mode == ASYNCHRONIC)
     this->SetMode(SYNCHRONIC); // Ignore fail.
 
   // Read data.
   int received = 0;
   bool error_state = false;
 
-  while(received != Size) 
+  while(received != Size)
   {
     // Read a portion of data.
     int left = Size - received;
@@ -345,7 +346,7 @@ NetSock::ReadAll(void *Buffer, int Size)
   return received;
 }
 
-int 
+int
 NetSock::Write(const void *Buffer, int Size)
 {
   if(this->socket == -1)
@@ -356,7 +357,7 @@ NetSock::Write(const void *Buffer, int Size)
   return send(this->socket, (const char*)Buffer, Size, 0);
 }
 
-int 
+int
 NetSock::WriteAll(const void *Buffer, int Size)
 {
   if(this->socket == -1)
@@ -373,12 +374,12 @@ NetSock::WriteAll(const void *Buffer, int Size)
 
     // Thx to the anonymous . for pointing a bug that was previously
     // here.
-    if(ret == 0) 
+    if(ret == 0)
     {
       continue; // TODO: Add some sleep here, since obviously
                 // it cannot be sent now
     }
-    else if(ret == -1) 
+    else if(ret == -1)
     {
       // What's the problem?
 #ifdef __unix__
@@ -400,7 +401,7 @@ NetSock::WriteAll(const void *Buffer, int Size)
 }
 
 
-unsigned short 
+unsigned short
 NetSock::GetPort() const
 {
   return this->port;
@@ -424,13 +425,13 @@ NetSock::GetStrIP()
   return this->str_ip;
 }
 
-unsigned short 
+unsigned short
 NetSock::GetBindPort() const
 {
   return this->bindport;
 }
 
-unsigned int 
+unsigned int
 NetSock::GetBindIP() const
 {
   return this->bindip;
@@ -482,7 +483,7 @@ NetSock::BroadcastUDP(const char* broadcast, unsigned short port, const void *bu
       return -2;
 #endif
 
-    UDPCanBroadcast = true;    
+    UDPCanBroadcast = true;
   }
 
   memset(sock_info.sin_zero, 0, sizeof(sock_info.sin_zero));
@@ -519,7 +520,7 @@ NetSock::WriteUDP(const char* host, unsigned short port, const void *buffer, int
 #endif
 }
 
-int 
+int
 NetSock::ReadUDP(void *buffer, int size, char *srchost, unsigned short *srcport)
 {
   // Sanity check
@@ -535,7 +536,7 @@ NetSock::ReadUDP(void *buffer, int size, char *srchost, unsigned short *srcport)
 #ifndef WIN32_OLD
   int ret = recvfrom(socket, (char*)buffer, size, 0, (struct sockaddr*)&srcaddr, &len);
 #else
-  int ret = recvfrom(socket, buffer, size, 0, (struct sockaddr*)&srcaddr, &len);  
+  int ret = recvfrom(socket, buffer, size, 0, (struct sockaddr*)&srcaddr, &len);
 #endif
 
   // Fill some info ?
@@ -559,5 +560,11 @@ NetSock::ReadUDP(void *buffer, int size, char *srchost, unsigned short *srcport)
 
 int NetSock::GetDescriptor() const {
   return this->socket;
+}
+
+int NetSock::DetachDescriptor() {
+  int s = this->socket;
+  this->socket = -1;
+  return s;
 }
 

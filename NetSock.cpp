@@ -201,7 +201,7 @@ NetSock::Connect(const char* host, unsigned short port)
     memcpy(&ip, hostip->h_addr_list[0], 4);
   }
 
-  return this->Connect(htonl(ip), port);
+  return this->Connect(ip, port);
 }
 
 bool

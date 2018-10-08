@@ -7,10 +7,10 @@
 //   Mateusz "j00ru" Jurczyk
 //   and others
 //
-// Version: 2017-07-11
+// Version: 2018-10-08
 //
 // LICENSE
-//   Copyright 2017 Gynvael Coldwind
+//   Copyright 2018 Gynvael Coldwind
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -29,8 +29,8 @@
 #endif
 
 #if defined(WIN32)
+#  include <winsock2.h>
 #  include <windows.h>
-#  include <winsock.h>
 #elif defined(__unix__)
 #  include <sys/types.h>
 #  include <sys/socket.h>
@@ -138,7 +138,7 @@ NetSock::Listen(unsigned short port, const char *bindip)
 
   int enable = 1;
   if (setsockopt(this->socket, SOL_SOCKET,
-                 SO_REUSEADDR, &enable, sizeof(int)) < 0) {
+                 SO_REUSEADDR, (const char*)&enable, sizeof(int)) < 0) {
     this->socket = -1;
     return false;
   }
@@ -284,7 +284,11 @@ NetSock::Disconnect()
   if(this->socket == -1)
     return false;
 
+#if defined(WIN32)
+  shutdown(this->socket, SD_BOTH);
+#else
   shutdown(this->socket, SHUT_RDWR);
+#endif
   closesocket(this->socket);
   this->socket = -1;
   this->ip     = 0x00000000;

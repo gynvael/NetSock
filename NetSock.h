@@ -7,10 +7,10 @@
 //   Mateusz "j00ru" Jurczyk
 //   and others
 //
-// Version: 2017-07-11
+// Version: 2018-10-08
 //
 // LICENSE
-//   Copyright 2017 Gynvael Coldwind
+//   Copyright 2018 Gynvael Coldwind
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.

@@ -7,7 +7,7 @@
 //   Mateusz "j00ru" Jurczyk
 //   and others
 //
-// Version: 2018-10-08
+// Version: 2018-12-05 aka 1.1.1
 //
 // LICENSE
 //   Copyright 2018 Gynvael Coldwind
@@ -46,8 +46,11 @@ private:
   unsigned int    bindip;
   unsigned int    bindport;
 
+public:
   int   mode;
   int   socket;
+
+private:
   char  str_ip[16], str_bindip[16];
 
   bool  isUDP;

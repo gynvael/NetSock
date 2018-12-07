@@ -7,7 +7,7 @@
 //   Mateusz "j00ru" Jurczyk
 //   and others
 //
-// Version: 2018-10-08
+// Version: 2018-12-05 aka 1.1.1
 //
 // LICENSE
 //   Copyright 2018 Gynvael Coldwind
@@ -380,7 +380,10 @@ NetSock::WriteAll(const void *Buffer, int Size)
     // here.
     if(ret == 0)
     {
-      continue; // TODO: Add some sleep here, since obviously
+#ifdef __unix__
+      usleep(1000);
+#endif
+      continue; // TODO: Add some sleep on Windows here, since obviously
                 // it cannot be sent now
     }
     else if(ret == -1)
@@ -424,7 +427,14 @@ NetSock::GetStrIP()
   if(this->str_ip[0])
     return this->str_ip;
 
-  strncpy(this->str_ip, inet_ntoa(*(in_addr*)&this->ip), 16);
+  in_addr ip_addr;
+#ifdef __unix__
+  ip_addr.s_addr = this->ip;
+#elif _WIN32
+  ip_addr.S_un.S_addr = this->ip;
+#endif
+
+  strncpy(this->str_ip, inet_ntoa(ip_addr), 16);
   this->str_ip[15] = '\0';
   return this->str_ip;
 }
@@ -448,7 +458,14 @@ NetSock::GetStrBindIP()
   if(this->str_bindip[0])
     return this->str_bindip;
 
-  strncpy(this->str_bindip, inet_ntoa(*(in_addr*)&this->bindip), 16);
+  in_addr bindip_addr;
+#ifdef __unix__
+  bindip_addr.s_addr = this->bindip;
+#elif _WIN32
+  bindip_addr.S_un.S_addr = this->bindip;
+#endif
+
+  strncpy(this->str_bindip, inet_ntoa(bindip_addr), 16);
   this->str_bindip[15] = '\0';
   return this->str_bindip;
 }
